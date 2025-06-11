@@ -105,3 +105,23 @@ public with sharing class NearbyMapApexHandler {
         return R * c;
     }
 }
+
+
+
+
+
+
+
+List<NearbyMapApexHandler.NearbyInput> inputs = new List<NearbyMapApexHandler.NearbyInput>();
+
+NearbyMapApexHandler.NearbyInput input = new NearbyMapApexHandler.NearbyInput();
+input.recordId = 'RECORD_ID_HERE'; // <-- Replace with actual ID
+input.radius = 10; // radius in miles
+
+inputs.add(input);
+
+// Call the method
+List<NearbyMapApexHandler.NearbyOutput> output = NearbyMapApexHandler.getMap(inputs);
+
+// Print result in the log
+System.debug('Map URL: ' + output[0].mapUrl);
