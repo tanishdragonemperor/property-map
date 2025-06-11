@@ -50,12 +50,25 @@
 
         // Colored normal markers
         markers.forEach(m => {
-          const color = (m.color || "red").toLowerCase(); // fallback to red
+          const colorMap = {
+            red: "red",
+            blue: "blue",
+            green: "green",
+            yellow: "yellow",
+            purple: "purple",
+            orange: "orange",
+            pink: "pink",
+            white: "white"
+          };
+
+          const fallbackColor = "red";
+          const mappedColor = colorMap[(m.color || "").toLowerCase()] || fallbackColor;
+
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map: map,
             title: m.name,
-            icon: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`
+            icon: `http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png`
           });
 
           marker.addListener("click", () => {
