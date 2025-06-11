@@ -41,27 +41,19 @@
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 8,
-            fillColor: "black",
+            fillColor: "blue",
             fillOpacity: 1,
             strokeColor: "white",
             strokeWeight: 2
           }
         });
 
-        // Add other markers with custom colors and info windows
+        // Other markers (default red teardrop pins)
         markers.forEach(m => {
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map: map,
-            title: m.name,
-            icon: {
-              path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-              fillColor: m.color || "blue",
-              fillOpacity: 1,
-              strokeColor: "white",
-              strokeWeight: 1,
-              scale: 5
-            }
+            title: m.name
           });
 
           marker.addListener("click", () => {
