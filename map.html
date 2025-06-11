@@ -48,12 +48,14 @@
           }
         });
 
-        // Other markers (default red teardrop pins)
+        // Colored normal markers
         markers.forEach(m => {
+          const color = (m.color || "red").toLowerCase(); // fallback to red
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map: map,
-            title: m.name
+            title: m.name,
+            icon: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`
           });
 
           marker.addListener("click", () => {
