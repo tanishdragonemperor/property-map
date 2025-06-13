@@ -56,11 +56,11 @@
             position: { lat: m.lat, lng: m.lng },
             map: map,
             title: m.name,
-            icon: `http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png`
+            icon: http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png
           });
 
           marker.addListener("click", () => {
-            infoWindow.setContent(`<strong>${m.name}</strong>`);
+            infoWindow.setContent(<strong>${m.name}</strong>);
             infoWindow.open(map, marker);
           });
         });
