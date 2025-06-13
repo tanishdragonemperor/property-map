@@ -33,7 +33,27 @@
 
         const infoWindow = new google.maps.InfoWindow();
 
-        // All markers (including red one for user) come from Apex now
+        // Add a special highlighted marker for current location
+        const currentLocationMarker = new google.maps.Marker({
+          position: { lat, lng },
+          map: map,
+          title: "You are here",
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: "red",
+            fillOpacity: 1,
+            strokeColor: "white",
+            strokeWeight: 3
+          },
+          zIndex: 999
+        });
+
+        // Show info window by default
+        infoWindow.setContent(`<strong>You are here</strong>`);
+        infoWindow.open(map, currentLocationMarker);
+
+        // Other markers
         markers.forEach(m => {
           const colorMap = {
             red: "red",
@@ -50,17 +70,23 @@
           };
 
           const fallbackColor = "blue";
-          const mappedColor = colorMap[(m.color || "").toLowerCase()] || fallbackColor;
+          const isCurrentLocation = m.lat === lat && m.lng === lng;
+
+          const mappedColor = isCurrentLocation
+            ? fallbackColor // avoid red for other markers
+            : (colorMap[(m.color || "").toLowerCase()] === "red"
+              ? fallbackColor
+              : colorMap[(m.color || "").toLowerCase()] || fallbackColor);
 
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
             map: map,
             title: m.name,
-            icon: http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png
+            icon: `http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png`
           });
 
           marker.addListener("click", () => {
-            infoWindow.setContent(<strong>${m.name}</strong>);
+            infoWindow.setContent(`<strong>${m.name}</strong>`);
             infoWindow.open(map, marker);
           });
         });
