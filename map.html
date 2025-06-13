@@ -33,6 +33,7 @@
 
         const infoWindow = new google.maps.InfoWindow();
 
+        // All markers (including red one for user) come from Apex now
         markers.forEach(m => {
           const colorMap = {
             red: "red",
@@ -49,13 +50,7 @@
           };
 
           const fallbackColor = "blue";
-          const isCurrentLocation = m.lat === lat && m.lng === lng;
-
-          const mappedColor = isCurrentLocation
-            ? "red"
-            : (colorMap[(m.color || "").toLowerCase()] === "red"
-              ? fallbackColor
-              : colorMap[(m.color || "").toLowerCase()] || fallbackColor);
+          const mappedColor = colorMap[(m.color || "").toLowerCase()] || fallbackColor;
 
           const marker = new google.maps.Marker({
             position: { lat: m.lat, lng: m.lng },
