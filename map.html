@@ -33,22 +33,7 @@
 
         const infoWindow = new google.maps.InfoWindow();
 
-        // Main marker for the current location
-        new google.maps.Marker({
-          position: { lat, lng },
-          map: map,
-          title: "You are here",
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "blue",
-            fillOpacity: 1,
-            strokeColor: "white",
-            strokeWeight: 2
-          }
-        });
-
-        // Colored normal markers
+        // All markers (including red one for user) come from Apex now
         markers.forEach(m => {
           const colorMap = {
             red: "red",
@@ -58,10 +43,13 @@
             purple: "purple",
             orange: "orange",
             pink: "pink",
+            black: "black",
+            brown: "brown",
+            cyan: "cyan",
             white: "white"
           };
 
-          const fallbackColor = "red";
+          const fallbackColor = "blue";
           const mappedColor = colorMap[(m.color || "").toLowerCase()] || fallbackColor;
 
           const marker = new google.maps.Marker({
