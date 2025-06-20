@@ -218,3 +218,15 @@ public with sharing class NearbyMapFromPromptHandler {
         return new List<OutputWrapper>{ o };
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

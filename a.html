@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nearby Records Map</title>
+    <style>
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+      
+      .info-window {
+        font-family: Arial, sans-serif;
+        max-width: 250px;
+      }
+      
+      .info-window h3 {
+        margin: 0 0 10px 0;
+        color: #1976d2;
+        font-size: 16px;
+      }
+      
+      .info-window .field {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      
+      .info-window .field-label {
+        font-weight: bold;
+        color: #555;
+      }
+      
+      .info-window .distance {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #eee;
+        font-style: italic;
+        color: #666;
+      }
+      
+      .current-location {
+        color: #d32f2f;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      function initMap() {
+        const query = new URLSearchParams(window.location.search);
+        const lat = parseFloat(query.get("lat"));
+        const lng = parseFloat(query.get("lng"));
+        const markerData = query.get("markers");
+
+        let markers = [];
+        try {
+          markers = JSON.parse(decodeURIComponent(markerData));
+          console.log("📍 Loaded markers:", markers);
+        } catch (e) {
+          console.error("❌ Failed to parse markers:", e);
+          markers = [];
+        }
+
+        // Initialize map
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: { lat, lng },
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }]
+            }
+          ]
+        });
+
+        const infoWindow = new google.maps.InfoWindow();
+
+        // Color mapping for markers
+        const colorMap = {
+          red: "#FF0000",
+          blue: "#0000FF", 
+          green: "#008000",
+          yellow: "#FFFF00",
+          purple: "#800080",
+          orange: "#FFA500",
+          pink: "#FFC0CB",
+          black: "#000000",
+          brown: "#A52A2A",
+          cyan: "#00FFFF"
+        };
+
+        // Process each marker
+        markers.forEach((marker, index) => {
+          const isCurrentLocation = marker.name && marker.name.includes("(Current)");
+          const markerColor = marker.color ? marker.color.toLowerCase() : "blue";
+          
+          let markerIcon;
+          
+          if (isCurrentLocation) {
+            // Special icon for current location
+            markerIcon = {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: "#FF0000",
+              fillOpacity: 1,
+              strokeColor: "#FFFFFF",
+              strokeWeight: 3
+            };
+          } else {
+            // Standard colored markers for other locations
+            const color = colorMap[markerColor] || colorMap.blue;
+            markerIcon = `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`;
+          }
+
+          const mapMarker = new google.maps.Marker({
+            position: { lat: parseFloat(marker.lat), lng: parseFloat(marker.lng) },
+            map: map,
+            title: marker.name,
+            icon: markerIcon,
+            zIndex: isCurrentLocation ? 999 : 100 + index
+          });
+
+          // Create info window content
+          let infoContent = '';
+          
+          if (isCurrentLocation) {
+            infoContent = `
+              <div class="info-window">
+                <h3 class="current-location">${marker.name}</h3>
+                <div class="field">This is your current location</div>
+              </div>
+            `;
+          } else {
+            infoContent = `
+              <div class="info-window">
+                <h3>${marker.name}</h3>
+            `;
+            
+            // Add any additional fields if present in marker data
+            if (marker.fields) {
+              for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
+                if (fieldValue && fieldName !== 'Name') {
+                  infoContent += `
+                    <div class="field">
+                      <span class="field-label">${fieldName}:</span> ${fieldValue}
+                    </div>
+                  `;
+                }
+              }
+            }
+            
+            // Add distance if available
+            if (marker.distance) {
+              infoContent += `
+                <div class="distance">
+                  Distance: ${parseFloat(marker.distance).toFixed(2)} miles
+                </div>
+              `;
+            }
+            
+            infoContent += '</div>';
+          }
+
+          // Add click listener to show info window
+          mapMarker.addListener("click", () => {
+            infoWindow.setContent(infoContent);
+            infoWindow.open(map, mapMarker);
+          });
+
+          // Auto-open info window for current location
+          if (isCurrentLocation) {
+            setTimeout(() => {
+              infoWindow.setContent(infoContent);
+              infoWindow.open(map, mapMarker);
+            }, 500);
+          }
+        });
+
+        // Adjust map bounds to fit all markers if there are multiple
+        if (markers.length > 1) {
+          const bounds = new google.maps.LatLngBounds();
+          markers.forEach(marker => {
+            bounds.extend(new google.maps.LatLng(parseFloat(marker.lat), parseFloat(marker.lng)));
+          });
+          
+          // Fit bounds with padding
+          map.fitBounds(bounds);
+          
+          // Ensure minimum zoom level
+          google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+            if (map.getZoom() > 15) {
+              map.setZoom(15);
+            }
+          });
+        }
+      }
+
+      // Handle map loading errors
+      window.gm_authFailure = function() {
+        document.getElementById('map').innerHTML = 
+          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;color:#d32f2f;">' +
+          '<div style="text-align:center;">' +
+          '<h2>⚠️ Map Loading Error</h2>' +
+          '<p>Google Maps API key issue. Please check the API key configuration.</p>' +
+          '</div></div>';
+      };
+    </script>
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPNJdrrJF3ATJncQLUYxcMo02F3hGyPoU&callback=initMap"
+      async
+      defer
+      onerror="document.getElementById('map').innerHTML='<div style=&quot;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;color:#d32f2f;&quot;><div style=&quot;text-align:center;&quot;><h2>⚠️ Map Loading Error</h2><p>Failed to load Google Maps. Please try again later.</p></div></div>'"
+    ></script>
+  </body>
+</html>
