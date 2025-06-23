@@ -272,7 +272,14 @@ public with sharing class NearbyRecordsHandler {
             records.sort(new DistanceComparator());
 
             // Return up to 30 records
-            return records.size() > 30 ? records.subList(0, 30) : records;
+            if (records.size() > 30) {
+                List<Map<String, Object>> limitedRecords = new List<Map<String, Object>>();
+                for (Integer i = 0; i < 30; i++) {
+                    limitedRecords.add(records[i]);
+                }
+                return limitedRecords;
+            }
+            return records;
             
         } catch (Exception e) {
             System.debug('Error finding nearby records: ' + e.getMessage());
