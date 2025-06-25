@@ -6,7 +6,7 @@
       body {
         margin: 0;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #e8f0fe 0%, #f1f5f9 100%);
       }
       
       #map {
@@ -32,7 +32,7 @@
         font-size: 18px;
         font-weight: 700;
         padding: 16px 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         display: flex;
         align-items: center;
         gap: 10px;
@@ -50,16 +50,16 @@
       
       .info-window .field-section {
         margin: 16px 0;
-        background: linear-gradient(135deg, #f8fafe 0%, #f1f4ff 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         padding: 16px;
         border-radius: 10px;
-        border-left: 4px solid #667eea;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+        border-left: 4px solid #4f46e5;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
       }
       
       .info-window .field-section h4 {
         margin: 0 0 12px 0;
-        color: #4c5fff;
+        color: #4338ca;
         font-size: 14px;
         font-weight: 700;
         text-transform: uppercase;
@@ -76,7 +76,7 @@
         align-items: flex-start;
         gap: 12px;
         padding: 8px 0;
-        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        border-bottom: 1px solid rgba(79, 70, 229, 0.1);
       }
       
       .info-window .field:last-child {
@@ -84,7 +84,7 @@
       }
       
       .info-window .field-icon {
-        color: #667eea;
+        color: #4f46e5;
         font-size: 16px;
         min-width: 20px;
         margin-top: 2px;
@@ -96,25 +96,25 @@
       
       .info-window .field-label {
         font-weight: 600;
-        color: #2d3748;
+        color: #374151;
         display: block;
         margin-bottom: 4px;
         font-size: 13px;
       }
       
       .info-window .field-value {
-        color: #4a5568;
+        color: #6b7280;
         word-break: break-word;
         font-size: 14px;
       }
       
       .info-window .distance-info {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         padding: 12px 16px;
         border-radius: 10px;
         margin: 16px 0;
-        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
       }
       
       .info-window .distance-row {
@@ -135,14 +135,14 @@
       }
       
       .info-window .coordinates {
-        background: linear-gradient(135deg, #fef5e7 0%, #feebc8 100%);
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
         padding: 12px;
         border-radius: 8px;
         font-family: 'Courier New', monospace;
         font-size: 12px;
-        color: #c05621;
+        color: #92400e;
         margin-top: 12px;
-        border: 1px solid #fed7aa;
+        border: 1px solid #fbbf24;
       }
       
       .current-location {
@@ -150,21 +150,21 @@
       }
       
       .current-location-badge {
-        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 700;
         margin-left: 8px;
-        box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
         animation: pulse 2s infinite;
       }
       
       @keyframes pulse {
-        0% { box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3); }
-        50% { box-shadow: 0 4px 16px rgba(245, 101, 101, 0.5); }
-        100% { box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3); }
+        0% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
+        50% { box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5); }
+        100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
       }
       
       .info-window .stats-grid {
@@ -179,26 +179,26 @@
         padding: 12px;
         border-radius: 8px;
         text-align: center;
-        border: 2px solid #e2e8f0;
+        border: 2px solid #e5e7eb;
         transition: all 0.3s ease;
       }
       
       .info-window .stat-item:hover {
-        border-color: #667eea;
+        border-color: #4f46e5;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
       }
       
       .info-window .stat-value {
         font-weight: 700;
-        color: #667eea;
+        color: #4f46e5;
         font-size: 18px;
         display: block;
       }
       
       .info-window .stat-label {
         font-size: 11px;
-        color: #718096;
+        color: #9ca3af;
         text-transform: uppercase;
         margin-top: 4px;
         font-weight: 600;
@@ -207,7 +207,7 @@
       .navigation-buttons {
         margin-top: 16px;
         padding-top: 16px;
-        border-top: 2px solid #f7fafc;
+        border-top: 2px solid #f9fafb;
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
@@ -218,7 +218,7 @@
         align-items: center;
         gap: 8px;
         padding: 12px 16px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         color: white;
         text-decoration: none;
         border-radius: 8px;
@@ -227,7 +227,7 @@
         cursor: pointer;
         border: none;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         flex: 1;
         justify-content: center;
         min-width: 140px;
@@ -235,16 +235,16 @@
       
       .nav-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
       }
       
       .nav-btn.secondary {
-        background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
-        box-shadow: 0 2px 8px rgba(113, 128, 150, 0.3);
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
       }
       
       .nav-btn.secondary:hover {
-        box-shadow: 0 4px 16px rgba(113, 128, 150, 0.4);
+        box-shadow: 0 4px 16px rgba(107, 114, 128, 0.4);
       }
       
       .loading-overlay {
@@ -253,7 +253,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -286,7 +286,7 @@
         padding: 12px 16px;
         border-radius: 8px;
         font-size: 12px;
-        color: #4a5568;
+        color: #6b7280;
         font-weight: 600;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         z-index: 1000;
@@ -327,40 +327,21 @@
           markers = [];
         }
 
-        // Initialize map with enhanced styling
+        // Initialize map with normal Google Maps styling (minimal custom styling)
         map = new google.maps.Map(document.getElementById("map"), {
           zoom: 12,
           center: { lat, lng },
           styles: [
+            // Minimal styling to keep the natural Google Maps look
             {
-              featureType: "all",
-              elementType: "geometry",
-              stylers: [{ color: "#f5f5f5" }]
-            },
-            {
-              featureType: "water",
-              elementType: "geometry",
-              stylers: [{ color: "#c9c9c9" }]
-            },
-            {
-              featureType: "poi",
-              elementType: "labels",
+              featureType: "poi.business",
               stylers: [{ visibility: "off" }]
-            },
-            {
-              featureType: "road",
-              elementType: "geometry",
-              stylers: [{ color: "#ffffff" }]
-            },
-            {
-              featureType: "road.arterial",
-              elementType: "labels.text.fill",
-              stylers: [{ color: "#757575" }]
             }
           ],
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: true
+          mapTypeControl: true,
+          streetViewControl: true,
+          fullscreenControl: true,
+          zoomControl: true
         });
 
         infoWindow = new google.maps.InfoWindow();
@@ -404,7 +385,7 @@
             markerIcon = {
               path: google.maps.SymbolPath.CIRCLE,
               scale: 15,
-              fillColor: "#FF4444",
+              fillColor: "#ef4444",
               fillOpacity: 1,
               strokeColor: "#FFFFFF",
               strokeWeight: 4
@@ -703,16 +684,16 @@
       function formatFieldValue(fieldName, fieldValue) {
         // Format specific field types
         if (fieldName.toLowerCase().includes('email')) {
-          return `<a href="mailto:${fieldValue}" style="color: #667eea; text-decoration: none;">${fieldValue}</a>`;
+          return `<a href="mailto:${fieldValue}" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
         }
         if (fieldName.toLowerCase().includes('phone')) {
-          return `<a href="tel:${fieldValue}" style="color: #667eea; text-decoration: none;">${fieldValue}</a>`;
+          return `<a href="tel:${fieldValue}" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
         }
         if (fieldName.toLowerCase().includes('website')) {
-          return `<a href="${fieldValue}" target="_blank" style="color: #667eea; text-decoration: none;">${fieldValue}</a>`;
+          return `<a href="${fieldValue}" target="_blank" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
         }
         if (fieldName.toLowerCase().includes('revenue') || fieldName.toLowerCase().includes('price')) {
-          return `$${Number(fieldValue).toLocaleString()}`;
+          return `${Number(fieldValue).toLocaleString()}`;
         }
         if (fieldName.toLowerCase().includes('age') && !isNaN(fieldValue)) {
           return `${fieldValue} ${fieldValue == 1 ? 'year' : 'years'}`;
