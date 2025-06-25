@@ -1,158 +1,317 @@
-<!-- <!DOCTYPE html>
-<html>
-  <head>
-    <title>Nearby Properties Map</title>
-    <style>
-      #map {
-        height: 100vh;
-        width: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-
-    <script>
-      function initMap() {
-        const query = new URLSearchParams(window.location.search);
-        const lat = parseFloat(query.get("lat"));
-        const lng = parseFloat(query.get("lng"));
-        const markerData = query.get("markers");
-
-        let markers = [];
-        try {
-          markers = JSON.parse(decodeURIComponent(markerData));
-        } catch (e) {
-          console.error("❌ Failed to parse markers:", e);
-        }
-
-        const map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 12,
-          center: { lat, lng }
-        });
-
-        const infoWindow = new google.maps.InfoWindow();
-
-        // Add a special highlighted marker for current location
-        const currentLocationMarker = new google.maps.Marker({
-          position: { lat, lng },
-          map: map,
-          title: "You are here",
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: "red",
-            fillOpacity: 1,
-            strokeColor: "white",
-            strokeWeight: 3
-          },
-          zIndex: 999
-        });
-
-        // Show info window by default
-        infoWindow.setContent(`<strong>You are here</strong>`);
-        infoWindow.open(map, currentLocationMarker);
-
-        // Other markers
-        markers.forEach(m => {
-          const colorMap = {
-            red: "red",
-            blue: "blue",
-            green: "green",
-            yellow: "yellow",
-            purple: "purple",
-            orange: "orange",
-            pink: "pink",
-            black: "black",
-            brown: "brown",
-            cyan: "cyan",
-            white: "white"
-          };
-
-          const fallbackColor = "blue";
-          const isCurrentLocation = m.lat === lat && m.lng === lng;
-
-          const mappedColor = isCurrentLocation
-            ? fallbackColor // avoid red for other markers
-            : (colorMap[(m.color || "").toLowerCase()] === "red"
-              ? fallbackColor
-              : colorMap[(m.color || "").toLowerCase()] || fallbackColor);
-
-          const marker = new google.maps.Marker({
-            position: { lat: m.lat, lng: m.lng },
-            map: map,
-            title: m.name,
-            icon: `http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png`
-          });
-
-          marker.addListener("click", () => {
-            infoWindow.setContent(`<strong>${m.name}</strong>`);
-            infoWindow.open(map, marker);
-          });
-        });
-      }
-    </script>
-
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPNJdrrJF3ATJncQLUYxcMo02F3hGyPoU&callback=initMap"
-      async
-      defer
-    ></script>
-  </body>
-</html> -->
-
-
-
-
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Nearby Records Map</title>
+    <title>Nearby Records Map with Navigation</title>
     <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      
       #map {
         height: 100vh;
         width: 100%;
       }
       
       .info-window {
-        font-family: Arial, sans-serif;
-        max-width: 250px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 380px;
+        min-width: 300px;
+        line-height: 1.4;
       }
       
       .info-window h3 {
-        margin: 0 0 10px 0;
+        margin: 0 0 12px 0;
         color: #1976d2;
-        font-size: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        border-bottom: 2px solid #e3f2fd;
+        padding-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .info-window .record-icon {
+        font-size: 20px;
+      }
+      
+      .info-window .field-section {
+        margin: 12px 0;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 3px solid #1976d2;
+      }
+      
+      .info-window .field-section h4 {
+        margin: 0 0 8px 0;
+        color: #1976d2;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
       
       .info-window .field {
-        margin: 5px 0;
+        margin: 6px 0;
+        font-size: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .info-window .field-icon {
+        color: #666;
         font-size: 14px;
+        min-width: 16px;
+        margin-top: 1px;
+      }
+      
+      .info-window .field-content {
+        flex: 1;
       }
       
       .info-window .field-label {
-        font-weight: bold;
-        color: #555;
+        font-weight: 600;
+        color: #333;
+        display: block;
+        margin-bottom: 2px;
       }
       
-      .info-window .distance {
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid #eee;
-        font-style: italic;
-        color: #666;
+      .info-window .field-value {
+        color: #555;
+        word-break: break-word;
+      }
+      
+      .info-window .distance-badge {
+        background: linear-gradient(135deg, #4caf50, #45a049);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 8px;
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+      }
+      
+      .info-window .coordinates {
+        background: #fff3e0;
+        padding: 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: #bf360c;
+        margin-top: 8px;
+        border: 1px solid #ffcc02;
+      }
+      
+      .info-window .record-id {
+        background: #e8f5e8;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: #2e7d32;
+        margin-top: 6px;
+        display: inline-block;
       }
       
       .current-location {
         color: #d32f2f;
         font-weight: bold;
       }
+      
+      .current-location-badge {
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+      
+      .info-window .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      
+      .info-window .stat-item {
+        background: white;
+        padding: 8px;
+        border-radius: 4px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+      }
+      
+      .info-window .stat-value {
+        font-weight: 600;
+        color: #1976d2;
+        font-size: 16px;
+        display: block;
+      }
+      
+      .info-window .stat-label {
+        font-size: 11px;
+        color: #666;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+      
+      .navigation-buttons {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+      }
+      
+      .nav-btn {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 2px;
+        background-color: #1976d2;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s;
+      }
+      
+      .nav-btn:hover {
+        background-color: #1565c0;
+      }
+      
+      .nav-btn.secondary {
+        background-color: #757575;
+      }
+      
+      .nav-btn.secondary:hover {
+        background-color: #616161;
+      }
+      
+      .controls-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-width: 250px;
+      }
+      
+      .controls-panel h4 {
+        margin: 0 0 10px 0;
+        color: #1976d2;
+        font-size: 14px;
+      }
+      
+      .route-options {
+        margin-bottom: 10px;
+      }
+      
+      .route-options button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      
+      .route-options button:hover {
+        background-color: #45a049;
+      }
+      
+      .route-options button.danger {
+        background-color: #f44336;
+      }
+      
+      .route-options button.danger:hover {
+        background-color: #da190b;
+      }
+      
+      .directions-panel {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        bottom: 10px;
+        width: 300px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        overflow-y: auto;
+        display: none;
+        padding: 15px;
+      }
+      
+      .directions-panel h3 {
+        margin: 0 0 15px 0;
+        color: #1976d2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .close-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
+    
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+      <h4>🗺️ Navigation Controls</h4>
+      <div class="route-options">
+        <button onclick="planMultiStopRoute()">📍 Plan Multi-Stop Route</button>
+        <button onclick="clearAllRoutes()" class="danger">🗑️ Clear All Routes</button>
+      </div>
+      <div style="font-size: 11px; color: #666; margin-top: 8px;">
+        💡 Click any marker to get directions or add to route
+      </div>
+    </div>
+    
+    <!-- Directions Panel -->
+    <div id="directionsPanel" class="directions-panel">
+      <h3>
+        🧭 Directions
+        <button class="close-btn" onclick="closeDirectionsPanel()">&times;</button>
+      </h3>
+      <div id="directionsContent"></div>
+    </div>
 
     <script>
+      let map;
+      let directionsService;
+      let directionsRenderer;
+      let infoWindow;
+      let currentLocation = null;
+      let allMarkers = [];
+      let selectedWaypoints = [];
+      let markerClickHandlers = new Map();
+
       function initMap() {
         const query = new URLSearchParams(window.location.search);
         const lat = parseFloat(query.get("lat"));
@@ -169,7 +328,7 @@
         }
 
         // Initialize map
-        const map = new google.maps.Map(document.getElementById("map"), {
+        map = new google.maps.Map(document.getElementById("map"), {
           zoom: 12,
           center: { lat, lng },
           styles: [
@@ -181,7 +340,15 @@
           ]
         });
 
-        const infoWindow = new google.maps.InfoWindow();
+        // Initialize directions service and renderer
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+          draggable: true,
+          panel: document.getElementById('directionsContent')
+        });
+        directionsRenderer.setMap(map);
+
+        infoWindow = new google.maps.InfoWindow();
 
         // Color mapping for markers
         const colorMap = {
@@ -201,6 +368,14 @@
         markers.forEach((marker, index) => {
           const isCurrentLocation = marker.name && marker.name.includes("(Current)");
           const markerColor = marker.color ? marker.color.toLowerCase() : "blue";
+          
+          if (isCurrentLocation) {
+            currentLocation = {
+              lat: parseFloat(marker.lat),
+              lng: parseFloat(marker.lng),
+              name: marker.name
+            };
+          }
           
           let markerIcon;
           
@@ -228,52 +403,21 @@
             zIndex: isCurrentLocation ? 999 : 100 + index
           });
 
-          // Create info window content
-          let infoContent = '';
-          
-          if (isCurrentLocation) {
-            infoContent = `
-              <div class="info-window">
-                <h3 class="current-location">${marker.name}</h3>
-                <div class="field">This is your current location</div>
-              </div>
-            `;
-          } else {
-            infoContent = `
-              <div class="info-window">
-                <h3>${marker.name}</h3>
-            `;
-            
-            // Add any additional fields if present in marker data
-            if (marker.fields) {
-              for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
-                if (fieldValue && fieldName !== 'Name') {
-                  infoContent += `
-                    <div class="field">
-                      <span class="field-label">${fieldName}:</span> ${fieldValue}
-                    </div>
-                  `;
-                }
-              }
-            }
-            
-            // Add distance if available
-            if (marker.distance) {
-              infoContent += `
-                <div class="distance">
-                  Distance: ${parseFloat(marker.distance).toFixed(2)} miles
-                </div>
-              `;
-            }
-            
-            infoContent += '</div>';
-          }
+          // Store marker data
+          mapMarker.markerData = marker;
+          allMarkers.push(mapMarker);
+
+          // Create info window content with navigation buttons
+          let infoContent = createInfoWindowContent(marker, isCurrentLocation);
 
           // Add click listener to show info window
-          mapMarker.addListener("click", () => {
+          const clickHandler = () => {
             infoWindow.setContent(infoContent);
             infoWindow.open(map, mapMarker);
-          });
+          };
+          
+          mapMarker.addListener("click", clickHandler);
+          markerClickHandlers.set(mapMarker, clickHandler);
 
           // Auto-open info window for current location
           if (isCurrentLocation) {
@@ -301,6 +445,354 @@
             }
           });
         }
+      }
+
+      function createInfoWindowContent(marker, isCurrentLocation) {
+        let infoContent = '';
+        
+        if (isCurrentLocation) {
+          infoContent = `
+            <div class="info-window">
+              <h3 class="current-location">
+                <span class="record-icon">📍</span>
+                ${marker.name}
+                <span class="current-location-badge">YOU ARE HERE</span>
+              </h3>
+              
+              <div class="field-section">
+                <h4>📍 Location Details</h4>
+                <div class="field">
+                  <span class="field-icon">🌍</span>
+                  <div class="field-content">
+                    <span class="field-label">Status</span>
+                    <span class="field-value">Current Location</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="coordinates">
+                <strong>📐 Coordinates:</strong><br>
+                Latitude: ${parseFloat(marker.lat).toFixed(6)}<br>
+                Longitude: ${parseFloat(marker.lng).toFixed(6)}
+              </div>
+            </div>
+          `;
+        } else {
+          // Determine record type icon
+          let recordIcon = '🏢';
+          let recordType = 'Record';
+          
+          if (marker.name && (marker.name.toLowerCase().includes('property') || marker.fields?.Name?.toLowerCase().includes('property'))) {
+            recordIcon = '🏠';
+            recordType = 'Property';
+          } else if (marker.name && (marker.name.toLowerCase().includes('lead') || marker.fields?.Name?.toLowerCase().includes('lead'))) {
+            recordIcon = '👤';
+            recordType = 'Lead';
+          }
+          
+          infoContent = `
+            <div class="info-window">
+              <h3>
+                <span class="record-icon">${recordIcon}</span>
+                ${marker.name || 'Unnamed Location'}
+              </h3>
+          `;
+          
+          // Primary Information Section
+          if (marker.fields && Object.keys(marker.fields).length > 0) {
+            infoContent += `<div class="field-section">
+              <h4>📋 ${recordType} Information</h4>`;
+            
+            for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
+              if (fieldValue && fieldName !== 'Name') {
+                let fieldIcon = getFieldIcon(fieldName);
+                let displayName = getFieldDisplayName(fieldName);
+                let formattedValue = formatFieldValue(fieldName, fieldValue);
+                
+                infoContent += `
+                  <div class="field">
+                    <span class="field-icon">${fieldIcon}</span>
+                    <div class="field-content">
+                      <span class="field-label">${displayName}</span>
+                      <span class="field-value">${formattedValue}</span>
+                    </div>
+                  </div>
+                `;
+              }
+            }
+            infoContent += `</div>`;
+          }
+          
+          // Location & Distance Section
+          infoContent += `
+            <div class="field-section">
+              <h4>📍 Location & Distance</h4>
+              <div class="field">
+                <span class="field-icon">🎯</span>
+                <div class="field-content">
+                  <span class="field-label">Distance from you</span>
+                  <span class="field-value">${marker.distance ? parseFloat(marker.distance).toFixed(2) + ' miles' : 'Unknown'}</span>
+                </div>
+              </div>
+              <div class="field">
+                <span class="field-icon">⏱️</span>
+                <div class="field-content">
+                  <span class="field-label">Estimated drive time</span>
+                  <span class="field-value">${marker.distance ? Math.round(parseFloat(marker.distance) * 2.5) + ' minutes' : 'Unknown'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Quick Stats (if applicable)
+          if (marker.fields) {
+            let hasStats = false;
+            let statsContent = '';
+            
+            // Check for numeric fields to show as stats
+            for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
+              if (fieldValue && !isNaN(fieldValue) && fieldName !== 'Name') {
+                if (!hasStats) {
+                  statsContent += `<div class="stats-grid">`;
+                  hasStats = true;
+                }
+                
+                statsContent += `
+                  <div class="stat-item">
+                    <span class="stat-value">${fieldValue}</span>
+                    <div class="stat-label">${getFieldDisplayName(fieldName)}</div>
+                  </div>
+                `;
+              }
+            }
+            
+            if (hasStats) {
+              statsContent += `</div>`;
+              infoContent += `
+                <div class="field-section">
+                  <h4>📊 Quick Stats</h4>
+                  ${statsContent}
+                </div>
+              `;
+            }
+          }
+          
+          // Technical Details
+          infoContent += `
+            <div class="field-section">
+              <h4>🔧 Technical Details</h4>
+              <div class="coordinates">
+                <strong>📐 Coordinates:</strong><br>
+                Lat: ${parseFloat(marker.lat).toFixed(6)}<br>
+                Lng: ${parseFloat(marker.lng).toFixed(6)}
+              </div>
+              <div class="record-id">
+                🆔 Record ID: ${marker.id || 'Unknown'}
+              </div>
+            </div>
+          `;
+          
+          // Navigation Section
+          infoContent += `
+            <div class="navigation-buttons">
+              <button class="nav-btn" onclick="getDirections(${marker.lat}, ${marker.lng}, '${marker.name.replace(/'/g, "\\'")}')">
+                🧭 Get Directions
+              </button>
+              <button class="nav-btn secondary" onclick="addToRoute(${marker.lat}, ${marker.lng}, '${marker.name.replace(/'/g, "\\'")}')">
+                ➕ Add to Route
+              </button>
+              <br>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${marker.lat},${marker.lng}" 
+                 target="_blank" class="nav-btn" style="margin-top: 5px;">
+                📱 Open in Google Maps
+              </a>
+              <button class="nav-btn secondary" onclick="shareLocation(${marker.lat}, ${marker.lng}, '${marker.name.replace(/'/g, "\\'")}')">
+                📤 Share Location
+              </button>
+            </div>
+          `;
+          
+          infoContent += '</div>';
+        }
+
+        return infoContent;
+      }
+
+      function getFieldIcon(fieldName) {
+        const iconMap = {
+          'Company': '🏢',
+          'Status': '📊',
+          'Property_Name__c': '🏠',
+          'Property_Address__c': '📍',
+          'Property_Age_In_Years__c': '📅',
+          'Source_Contact_First_Name__c': '👤',
+          'Source_Contact_Last_Name__c': '👤',
+          'apiCount__c': '🔢',
+          'Email': '📧',
+          'Phone': '📞',
+          'Website': '🌐',
+          'Industry': '🏭',
+          'Revenue': '💰',
+          'Employees': '👥'
+        };
+        return iconMap[fieldName] || '📋';
+      }
+
+      function getFieldDisplayName(fieldName) {
+        const displayMap = {
+          'Company': 'Company',
+          'Status': 'Status', 
+          'Property_Name__c': 'Property Name',
+          'Property_Address__c': 'Property Address',
+          'Property_Age_In_Years__c': 'Property Age (Years)',
+          'Source_Contact_First_Name__c': 'First Name',
+          'Source_Contact_Last_Name__c': 'Last Name',
+          'apiCount__c': 'API Count',
+          'Email': 'Email Address',
+          'Phone': 'Phone Number',
+          'Website': 'Website',
+          'Industry': 'Industry',
+          'Revenue': 'Annual Revenue',
+          'Employees': 'Employee Count'
+        };
+        return displayMap[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      }
+
+      function formatFieldValue(fieldName, fieldValue) {
+        // Format specific field types
+        if (fieldName.toLowerCase().includes('email')) {
+          return `<a href="mailto:${fieldValue}" style="color: #1976d2;">${fieldValue}</a>`;
+        }
+        if (fieldName.toLowerCase().includes('phone')) {
+          return `<a href="tel:${fieldValue}" style="color: #1976d2;">${fieldValue}</a>`;
+        }
+        if (fieldName.toLowerCase().includes('website')) {
+          return `<a href="${fieldValue}" target="_blank" style="color: #1976d2;">${fieldValue}</a>`;
+        }
+        if (fieldName.toLowerCase().includes('revenue') || fieldName.toLowerCase().includes('price')) {
+          return `${Number(fieldValue).toLocaleString()}`;
+        }
+        if (fieldName.toLowerCase().includes('age') && !isNaN(fieldValue)) {
+          return `${fieldValue} ${fieldValue == 1 ? 'year' : 'years'}`;
+        }
+        
+        return fieldValue;
+      }
+
+      function shareLocation(lat, lng, name) {
+        if (navigator.share) {
+          navigator.share({
+            title: `Location: ${name}`,
+            text: `Check out this location: ${name}`,
+            url: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+          });
+        } else {
+          // Fallback for browsers that don't support Web Share API
+          const shareText = `Check out this location: ${name} - https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+          navigator.clipboard.writeText(shareText).then(() => {
+            alert('📋 Location details copied to clipboard!');
+          }).catch(() => {
+            alert(`📍 Share this location:\n${shareText}`);
+          });
+        }
+      }
+
+      function getDirections(destLat, destLng, destName) {
+        if (!currentLocation) {
+          alert("❌ Current location not available for navigation");
+          return;
+        }
+
+        const request = {
+          origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+          destination: new google.maps.LatLng(destLat, destLng),
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.IMPERIAL,
+          avoidHighways: false,
+          avoidTolls: false
+        };
+
+        directionsService.route(request, (result, status) => {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+            showDirectionsPanel();
+            
+            // Show route info
+            const route = result.routes[0];
+            const leg = route.legs[0];
+            console.log(`📍 Route to ${destName}: ${leg.distance.text}, ${leg.duration.text}`);
+          } else {
+            alert(`❌ Could not calculate route: ${status}`);
+          }
+        });
+      }
+
+      function addToRoute(lat, lng, name) {
+        const waypoint = {
+          location: new google.maps.LatLng(lat, lng),
+          name: name,
+          stopover: true
+        };
+        
+        selectedWaypoints.push(waypoint);
+        alert(`✅ Added "${name}" to route (${selectedWaypoints.length} stops selected)`);
+      }
+
+      function planMultiStopRoute() {
+        if (!currentLocation) {
+          alert("❌ Current location not available for navigation");
+          return;
+        }
+
+        if (selectedWaypoints.length === 0) {
+          alert("❌ Please add some locations to your route first by clicking 'Add to Route' on markers");
+          return;
+        }
+
+        // Optimize waypoint order
+        const request = {
+          origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+          destination: selectedWaypoints[selectedWaypoints.length - 1].location,
+          waypoints: selectedWaypoints.slice(0, -1),
+          optimizeWaypoints: true,
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.IMPERIAL
+        };
+
+        directionsService.route(request, (result, status) => {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+            showDirectionsPanel();
+            
+            // Show optimized route order
+            const optimizedOrder = result.routes[0].waypoint_order;
+            let routeInfo = "🗺️ Optimized Route:\n";
+            routeInfo += `1. Start: ${currentLocation.name}\n`;
+            
+            optimizedOrder.forEach((waypointIndex, i) => {
+              routeInfo += `${i + 2}. ${selectedWaypoints[waypointIndex].name}\n`;
+            });
+            
+            console.log(routeInfo);
+          } else {
+            alert(`❌ Could not calculate multi-stop route: ${status}`);
+          }
+        });
+      }
+
+      function clearAllRoutes() {
+        directionsRenderer.setDirections({routes: []});
+        selectedWaypoints = [];
+        closeDirectionsPanel();
+        console.log("🗑️ All routes cleared");
+      }
+
+      function showDirectionsPanel() {
+        document.getElementById('directionsPanel').style.display = 'block';
+      }
+
+      function closeDirectionsPanel() {
+        document.getElementById('directionsPanel').style.display = 'none';
       }
 
       // Handle map loading errors
