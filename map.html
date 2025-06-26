@@ -1,317 +1,158 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Nearby Properties Map</title>
+    <style>
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      function initMap() {
+        const query = new URLSearchParams(window.location.search);
+        const lat = parseFloat(query.get("lat"));
+        const lng = parseFloat(query.get("lng"));
+        const markerData = query.get("markers");
+
+        let markers = [];
+        try {
+          markers = JSON.parse(decodeURIComponent(markerData));
+        } catch (e) {
+          console.error("❌ Failed to parse markers:", e);
+        }
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: { lat, lng }
+        });
+
+        const infoWindow = new google.maps.InfoWindow();
+
+        // Add a special highlighted marker for current location
+        const currentLocationMarker = new google.maps.Marker({
+          position: { lat, lng },
+          map: map,
+          title: "You are here",
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: "red",
+            fillOpacity: 1,
+            strokeColor: "white",
+            strokeWeight: 3
+          },
+          zIndex: 999
+        });
+
+        // Show info window by default
+        infoWindow.setContent(`<strong>You are here</strong>`);
+        infoWindow.open(map, currentLocationMarker);
+
+        // Other markers
+        markers.forEach(m => {
+          const colorMap = {
+            red: "red",
+            blue: "blue",
+            green: "green",
+            yellow: "yellow",
+            purple: "purple",
+            orange: "orange",
+            pink: "pink",
+            black: "black",
+            brown: "brown",
+            cyan: "cyan",
+            white: "white"
+          };
+
+          const fallbackColor = "blue";
+          const isCurrentLocation = m.lat === lat && m.lng === lng;
+
+          const mappedColor = isCurrentLocation
+            ? fallbackColor // avoid red for other markers
+            : (colorMap[(m.color || "").toLowerCase()] === "red"
+              ? fallbackColor
+              : colorMap[(m.color || "").toLowerCase()] || fallbackColor);
+
+          const marker = new google.maps.Marker({
+            position: { lat: m.lat, lng: m.lng },
+            map: map,
+            title: m.name,
+            icon: `http://maps.google.com/mapfiles/ms/icons/${mappedColor}-dot.png`
+          });
+
+          marker.addListener("click", () => {
+            infoWindow.setContent(`<strong>${m.name}</strong>`);
+            infoWindow.open(map, marker);
+          });
+        });
+      }
+    </script>
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPNJdrrJF3ATJncQLUYxcMo02F3hGyPoU&callback=initMap"
+      async
+      defer
+    ></script>
+  </body>
+</html> -->
+
+
+
+
 <!DOCTYPE html>
 <html>
   <head>
     <title>Nearby Records Map</title>
     <style>
-      body {
-        margin: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #e8f0fe 0%, #f1f5f9 100%);
-      }
-      
       #map {
         height: 100vh;
         width: 100%;
-        border-radius: 0;
       }
       
       .info-window {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        max-width: 420px;
-        min-width: 320px;
-        line-height: 1.5;
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        font-family: Arial, sans-serif;
+        max-width: 250px;
       }
       
       .info-window h3 {
-        margin: 0;
-        color: white;
-        font-size: 18px;
-        font-weight: 700;
-        padding: 16px 20px;
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      
-      .info-window .record-icon {
-        font-size: 22px;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-      }
-      
-      .info-window-body {
-        padding: 20px;
-      }
-      
-      .info-window .field-section {
-        margin: 16px 0;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        padding: 16px;
-        border-radius: 10px;
-        border-left: 4px solid #4f46e5;
-        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
-      }
-      
-      .info-window .field-section h4 {
-        margin: 0 0 12px 0;
-        color: #4338ca;
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        margin: 0 0 10px 0;
+        color: #1976d2;
+        font-size: 16px;
       }
       
       .info-window .field {
-        margin: 10px 0;
+        margin: 5px 0;
         font-size: 14px;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid rgba(79, 70, 229, 0.1);
-      }
-      
-      .info-window .field:last-child {
-        border-bottom: none;
-      }
-      
-      .info-window .field-icon {
-        color: #4f46e5;
-        font-size: 16px;
-        min-width: 20px;
-        margin-top: 2px;
-      }
-      
-      .info-window .field-content {
-        flex: 1;
       }
       
       .info-window .field-label {
-        font-weight: 600;
-        color: #374151;
-        display: block;
-        margin-bottom: 4px;
-        font-size: 13px;
+        font-weight: bold;
+        color: #555;
       }
       
-      .info-window .field-value {
-        color: #6b7280;
-        word-break: break-word;
-        font-size: 14px;
-      }
-      
-      .info-window .distance-info {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        padding: 12px 16px;
-        border-radius: 10px;
-        margin: 16px 0;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      }
-      
-      .info-window .distance-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 4px 0;
-      }
-      
-      .info-window .distance-label {
-        font-size: 13px;
-        opacity: 0.9;
-      }
-      
-      .info-window .distance-value {
-        font-weight: 700;
-        font-size: 15px;
-      }
-      
-      .info-window .coordinates {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        padding: 12px;
-        border-radius: 8px;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        color: #92400e;
-        margin-top: 12px;
-        border: 1px solid #fbbf24;
+      .info-window .distance {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #eee;
+        font-style: italic;
+        color: #666;
       }
       
       .current-location {
-        color: white !important;
-      }
-      
-      .current-location-badge {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        margin-left: 8px;
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-        animation: pulse 2s infinite;
-      }
-      
-      @keyframes pulse {
-        0% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
-        50% { box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5); }
-        100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
-      }
-      
-      .info-window .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 12px;
-      }
-      
-      .info-window .stat-item {
-        background: white;
-        padding: 12px;
-        border-radius: 8px;
-        text-align: center;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s ease;
-      }
-      
-      .info-window .stat-item:hover {
-        border-color: #4f46e5;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
-      }
-      
-      .info-window .stat-value {
-        font-weight: 700;
-        color: #4f46e5;
-        font-size: 18px;
-        display: block;
-      }
-      
-      .info-window .stat-label {
-        font-size: 11px;
-        color: #9ca3af;
-        text-transform: uppercase;
-        margin-top: 4px;
-        font-weight: 600;
-      }
-      
-      .navigation-buttons {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 2px solid #f9fafb;
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-      
-      .nav-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 16px;
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-        flex: 1;
-        justify-content: center;
-        min-width: 140px;
-      }
-      
-      .nav-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
-      }
-      
-      .nav-btn.secondary {
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
-      }
-      
-      .nav-btn.secondary:hover {
-        box-shadow: 0 4px 16px rgba(107, 114, 128, 0.4);
-      }
-      
-      .loading-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        color: white;
-        font-size: 18px;
-        font-weight: 600;
-      }
-      
-      .loading-spinner {
-        border: 4px solid rgba(255,255,255,0.3);
-        border-radius: 50%;
-        border-top: 4px solid white;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-right: 16px;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      .map-watermark {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-size: 12px;
-        color: #6b7280;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        z-index: 1000;
-        backdrop-filter: blur(10px);
+        color: #d32f2f;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
-    <div class="loading-overlay" id="loadingOverlay">
-      <div class="loading-spinner"></div>
-      Loading Map...
-    </div>
-    
     <div id="map"></div>
-    
-    <div class="map-watermark">
-      📍 Nearby Records Map
-    </div>
 
     <script>
-      let map;
-      let infoWindow;
-      let currentLocation = null;
-      let allMarkers = [];
-
       function initMap() {
         const query = new URLSearchParams(window.location.search);
         const lat = parseFloat(query.get("lat"));
@@ -327,24 +168,20 @@
           markers = [];
         }
 
-        // Initialize map with normal Google Maps styling (minimal custom styling)
-        map = new google.maps.Map(document.getElementById("map"), {
+        // Initialize map
+        const map = new google.maps.Map(document.getElementById("map"), {
           zoom: 12,
           center: { lat, lng },
           styles: [
-            // Minimal styling to keep the natural Google Maps look
             {
-              featureType: "poi.business",
+              featureType: "poi",
+              elementType: "labels",
               stylers: [{ visibility: "off" }]
             }
-          ],
-          mapTypeControl: true,
-          streetViewControl: true,
-          fullscreenControl: true,
-          zoomControl: true
+          ]
         });
 
-        infoWindow = new google.maps.InfoWindow();
+        const infoWindow = new google.maps.InfoWindow();
 
         // Color mapping for markers
         const colorMap = {
@@ -360,19 +197,6 @@
           cyan: "#00FFFF"
         };
 
-        // Store current location for distance calculations
-        const currentLocationMarker = markers.find(marker => 
-          marker.name && marker.name.includes("(Current)")
-        );
-        
-        if (currentLocationMarker) {
-          currentLocation = {
-            lat: parseFloat(currentLocationMarker.lat),
-            lng: parseFloat(currentLocationMarker.lng),
-            name: currentLocationMarker.name
-          };
-        }
-
         // Process each marker
         markers.forEach((marker, index) => {
           const isCurrentLocation = marker.name && marker.name.includes("(Current)");
@@ -381,17 +205,18 @@
           let markerIcon;
           
           if (isCurrentLocation) {
-            // Special pulsing icon for current location
+            // Special icon for current location
             markerIcon = {
               path: google.maps.SymbolPath.CIRCLE,
-              scale: 15,
-              fillColor: "#ef4444",
+              scale: 12,
+              fillColor: "#FF0000",
               fillOpacity: 1,
               strokeColor: "#FFFFFF",
-              strokeWeight: 4
+              strokeWeight: 3
             };
           } else {
-            // Enhanced colored markers for other locations
+            // Standard colored markers for other locations
+            const color = colorMap[markerColor] || colorMap.blue;
             markerIcon = `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`;
           }
 
@@ -400,16 +225,49 @@
             map: map,
             title: marker.name,
             icon: markerIcon,
-            zIndex: isCurrentLocation ? 999 : 100 + index,
-            animation: isCurrentLocation ? google.maps.Animation.BOUNCE : null
+            zIndex: isCurrentLocation ? 999 : 100 + index
           });
 
-          // Store marker data
-          mapMarker.markerData = marker;
-          allMarkers.push(mapMarker);
-
           // Create info window content
-          let infoContent = createInfoWindowContent(marker, isCurrentLocation);
+          let infoContent = '';
+          
+          if (isCurrentLocation) {
+            infoContent = `
+              <div class="info-window">
+                <h3 class="current-location">${marker.name}</h3>
+                <div class="field">This is your current location</div>
+              </div>
+            `;
+          } else {
+            infoContent = `
+              <div class="info-window">
+                <h3>${marker.name}</h3>
+            `;
+            
+            // Add any additional fields if present in marker data
+            if (marker.fields) {
+              for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
+                if (fieldValue && fieldName !== 'Name') {
+                  infoContent += `
+                    <div class="field">
+                      <span class="field-label">${fieldName}:</span> ${fieldValue}
+                    </div>
+                  `;
+                }
+              }
+            }
+            
+            // Add distance if available
+            if (marker.distance) {
+              infoContent += `
+                <div class="distance">
+                  Distance: ${parseFloat(marker.distance).toFixed(2)} miles
+                </div>
+              `;
+            }
+            
+            infoContent += '</div>';
+          }
 
           // Add click listener to show info window
           mapMarker.addListener("click", () => {
@@ -422,7 +280,7 @@
             setTimeout(() => {
               infoWindow.setContent(infoContent);
               infoWindow.open(map, mapMarker);
-            }, 1000);
+            }, 500);
           }
         });
 
@@ -436,297 +294,23 @@
           // Fit bounds with padding
           map.fitBounds(bounds);
           
-          // Ensure reasonable zoom level
+          // Ensure minimum zoom level
           google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
-            if (map.getZoom() > 16) {
-              map.setZoom(16);
+            if (map.getZoom() > 15) {
+              map.setZoom(15);
             }
-          });
-        }
-
-        // Hide loading overlay
-        setTimeout(() => {
-          document.getElementById('loadingOverlay').style.display = 'none';
-        }, 1500);
-      }
-
-      function createInfoWindowContent(marker, isCurrentLocation) {
-        let infoContent = '';
-        
-        if (isCurrentLocation) {
-          infoContent = `
-            <div class="info-window">
-              <h3 class="current-location">
-                <span class="record-icon">📍</span>
-                Your Location
-                <span class="current-location-badge">YOU ARE HERE</span>
-              </h3>
-              
-              <div class="info-window-body">
-                <div class="field-section">
-                  <h4><span>🌍</span> Current Position</h4>
-                  <div class="field">
-                    <span class="field-icon">✅</span>
-                    <div class="field-content">
-                      <span class="field-label">Status</span>
-                      <span class="field-value">Active Location</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="coordinates">
-                  <strong>📐 Coordinates:</strong><br>
-                  Latitude: ${parseFloat(marker.lat).toFixed(6)}<br>
-                  Longitude: ${parseFloat(marker.lng).toFixed(6)}
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          // Determine record type icon
-          let recordIcon = '🏢';
-          let recordType = 'Record';
-          
-          if (marker.name && (marker.name.toLowerCase().includes('property') || marker.fields?.Name?.toLowerCase().includes('property'))) {
-            recordIcon = '🏠';
-            recordType = 'Property';
-          } else if (marker.name && (marker.name.toLowerCase().includes('lead') || marker.fields?.Name?.toLowerCase().includes('lead'))) {
-            recordIcon = '👤';
-            recordType = 'Lead';
-          }
-          
-          infoContent = `
-            <div class="info-window">
-              <h3>
-                <span class="record-icon">${recordIcon}</span>
-                ${marker.name || 'Unnamed Location'}
-              </h3>
-              
-              <div class="info-window-body">
-          `;
-          
-          // Calculate actual distance and drive time
-          let actualDistance = 0;
-          let driveTimeMinutes = 0;
-          
-          if (currentLocation && marker.lat && marker.lng) {
-            // Calculate distance using Haversine formula (more accurate)
-            actualDistance = calculateDistance(
-              currentLocation.lat, currentLocation.lng,
-              parseFloat(marker.lat), parseFloat(marker.lng)
-            );
-            
-            // Estimate drive time (assuming average speed of 25 mph in city/suburban areas)
-            driveTimeMinutes = Math.round(actualDistance / 25 * 60);
-          }
-          
-          // Distance Information Section (always first)
-          infoContent += `
-            <div class="distance-info">
-              <div class="distance-row">
-                <span class="distance-label">🎯 Distance from you</span>
-                <span class="distance-value">${actualDistance > 0 ? actualDistance.toFixed(2) + ' miles' : 'Calculating...'}</span>
-              </div>
-              <div class="distance-row">
-                <span class="distance-label">⏱️ Estimated drive time</span>
-                <span class="distance-value">${driveTimeMinutes > 0 ? driveTimeMinutes + ' minutes' : 'Calculating...'}</span>
-              </div>
-            </div>
-          `;
-          
-          // Primary Information Section
-          if (marker.fields && Object.keys(marker.fields).length > 0) {
-            infoContent += `<div class="field-section">
-              <h4><span>📋</span> ${recordType} Information</h4>`;
-            
-            for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
-              if (fieldValue && fieldName !== 'Name') {
-                let fieldIcon = getFieldIcon(fieldName);
-                let displayName = getFieldDisplayName(fieldName);
-                let formattedValue = formatFieldValue(fieldName, fieldValue);
-                
-                infoContent += `
-                  <div class="field">
-                    <span class="field-icon">${fieldIcon}</span>
-                    <div class="field-content">
-                      <span class="field-label">${displayName}</span>
-                      <span class="field-value">${formattedValue}</span>
-                    </div>
-                  </div>
-                `;
-              }
-            }
-            infoContent += `</div>`;
-          }
-          
-          // Quick Stats (if applicable)
-          if (marker.fields) {
-            let hasStats = false;
-            let statsContent = '';
-            
-            // Check for numeric fields to show as stats
-            for (const [fieldName, fieldValue] of Object.entries(marker.fields)) {
-              if (fieldValue && !isNaN(fieldValue) && fieldName !== 'Name') {
-                if (!hasStats) {
-                  statsContent += `<div class="stats-grid">`;
-                  hasStats = true;
-                }
-                
-                statsContent += `
-                  <div class="stat-item">
-                    <span class="stat-value">${fieldValue}</span>
-                    <div class="stat-label">${getFieldDisplayName(fieldName)}</div>
-                  </div>
-                `;
-              }
-            }
-            
-            if (hasStats) {
-              statsContent += `</div>`;
-              infoContent += `
-                <div class="field-section">
-                  <h4><span>📊</span> Quick Stats</h4>
-                  ${statsContent}
-                </div>
-              `;
-            }
-          }
-          
-          // Technical Details
-          infoContent += `
-            <div class="field-section">
-              <h4><span>🔧</span> Location Details</h4>
-              <div class="coordinates">
-                <strong>📐 Coordinates:</strong><br>
-                Lat: ${parseFloat(marker.lat).toFixed(6)}<br>
-                Lng: ${parseFloat(marker.lng).toFixed(6)}
-              </div>
-            </div>
-          `;
-          
-          // Navigation Section
-          infoContent += `
-            <div class="navigation-buttons">
-              <a href="https://www.google.com/maps/dir/${currentLocation ? currentLocation.lat + ',' + currentLocation.lng : ''}/${marker.lat},${marker.lng}" 
-                 target="_blank" class="nav-btn">
-                <span>🧭</span> Get Directions
-              </a>
-              <button class="nav-btn secondary" onclick="shareLocation(${marker.lat}, ${marker.lng}, '${marker.name.replace(/'/g, "\\'")}')">
-                <span>📤</span> Share Location
-              </button>
-            </div>
-          `;
-          
-          infoContent += '</div></div>';
-        }
-
-        return infoContent;
-      }
-
-      // Calculate distance between two points using Haversine formula
-      function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 3959; // Radius of the Earth in miles
-        const dLat = deg2rad(lat2 - lat1);
-        const dLon = deg2rad(lon2 - lon1);
-        const a = 
-          Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-          Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const d = R * c; // Distance in miles
-        return d;
-      }
-
-      function deg2rad(deg) {
-        return deg * (Math.PI/180);
-      }
-
-      function getFieldIcon(fieldName) {
-        const iconMap = {
-          'Company': '🏢',
-          'Status': '📊',
-          'Property_Name__c': '🏠',
-          'Property_Address__c': '📍',
-          'Property_Age_In_Years__c': '📅',
-          'Source_Contact_First_Name__c': '👤',
-          'Source_Contact_Last_Name__c': '👤',
-          'apiCount__c': '🔢',
-          'Email': '📧',
-          'Phone': '📞',
-          'Website': '🌐',
-          'Industry': '🏭',
-          'Revenue': '💰',
-          'Employees': '👥'
-        };
-        return iconMap[fieldName] || '📋';
-      }
-
-      function getFieldDisplayName(fieldName) {
-        const displayMap = {
-          'Company': 'Company',
-          'Status': 'Status', 
-          'Property_Name__c': 'Property Name',
-          'Property_Address__c': 'Property Address',
-          'Property_Age_In_Years__c': 'Property Age (Years)',
-          'Source_Contact_First_Name__c': 'First Name',
-          'Source_Contact_Last_Name__c': 'Last Name',
-          'apiCount__c': 'API Count',
-          'Email': 'Email Address',
-          'Phone': 'Phone Number',
-          'Website': 'Website',
-          'Industry': 'Industry',
-          'Revenue': 'Annual Revenue',
-          'Employees': 'Employee Count'
-        };
-        return displayMap[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      }
-
-      function formatFieldValue(fieldName, fieldValue) {
-        // Format specific field types
-        if (fieldName.toLowerCase().includes('email')) {
-          return `<a href="mailto:${fieldValue}" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
-        }
-        if (fieldName.toLowerCase().includes('phone')) {
-          return `<a href="tel:${fieldValue}" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
-        }
-        if (fieldName.toLowerCase().includes('website')) {
-          return `<a href="${fieldValue}" target="_blank" style="color: #4f46e5; text-decoration: none;">${fieldValue}</a>`;
-        }
-        if (fieldName.toLowerCase().includes('revenue') || fieldName.toLowerCase().includes('price')) {
-          return `${Number(fieldValue).toLocaleString()}`;
-        }
-        if (fieldName.toLowerCase().includes('age') && !isNaN(fieldValue)) {
-          return `${fieldValue} ${fieldValue == 1 ? 'year' : 'years'}`;
-        }
-        
-        return fieldValue;
-      }
-
-      function shareLocation(lat, lng, name) {
-        if (navigator.share) {
-          navigator.share({
-            title: `Location: ${name}`,
-            text: `Check out this location: ${name}`,
-            url: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
-          });
-        } else {
-          // Fallback for browsers that don't support Web Share API
-          const shareText = `Check out this location: ${name} - https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-          navigator.clipboard.writeText(shareText).then(() => {
-            alert('📋 Location details copied to clipboard!');
-          }).catch(() => {
-            alert(`📍 Share this location:\n${shareText}`);
           });
         }
       }
 
       // Handle map loading errors
       window.gm_authFailure = function() {
-        document.getElementById('loadingOverlay').innerHTML = 
+        document.getElementById('map').innerHTML = 
+          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;color:#d32f2f;">' +
           '<div style="text-align:center;">' +
-          '<h2 style="color: white; margin-bottom: 16px;">⚠️ Map Loading Error</h2>' +
-          '<p style="color: rgba(255,255,255,0.9);">Google Maps API key issue. Please check the API key configuration.</p>' +
-          '</div>';
+          '<h2>⚠️ Map Loading Error</h2>' +
+          '<p>Google Maps API key issue. Please check the API key configuration.</p>' +
+          '</div></div>';
       };
     </script>
 
@@ -734,7 +318,7 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPNJdrrJF3ATJncQLUYxcMo02F3hGyPoU&callback=initMap"
       async
       defer
-      onerror="document.getElementById('loadingOverlay').innerHTML='<div style=&quot;text-align:center;&quot;><h2 style=&quot;color: white; margin-bottom: 16px;&quot;>⚠️ Map Loading Error</h2><p style=&quot;color: rgba(255,255,255,0.9);&quot;>Failed to load Google Maps. Please try again later.</p></div>'"
+      onerror="document.getElementById('map').innerHTML='<div style=&quot;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;color:#d32f2f;&quot;><div style=&quot;text-align:center;&quot;><h2>⚠️ Map Loading Error</h2><p>Failed to load Google Maps. Please try again later.</p></div></div>'"
     ></script>
   </body>
 </html>
